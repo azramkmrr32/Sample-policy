@@ -1,0 +1,23 @@
+{
+  "policyRule": {
+    "if": {
+      "allOf": [
+        {
+          "field": "type",
+          "equals": "Microsoft.Resources/subscriptions/resourceGroups"
+        },
+        {
+          "field": "tags.environment",
+          "notIn": ["dev", "test", "prod"]
+        }
+      ]
+    },
+    "then": {
+      "effect": "deny"
+    }
+  },
+  "parameters": {},
+  "displayName": "Ensure resource groups have the 'environment' tag with values 'dev', 'test', or 'prod'",
+  "description": "This policy ensures that all resource groups have an 'environment' tag with values limited to 'dev', 'test', or 'prod'.",
+  "mode": "All"
+}
