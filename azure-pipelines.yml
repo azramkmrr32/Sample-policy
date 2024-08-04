@@ -1,0 +1,37 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  azureSubscription: 'YOUR_AZURE_SUBSCRIPTION_SERVICE_CONNECTION'
+  policyDefinitionName: 'require-environment-tag'
+  policyAssignmentName: 'require-environment-tag-assignment'
+  policyDisplayName: 'Require Environment Tag'
+  policyDescription: 'Ensure resource groups have the "environment" tag with values "dev", "test", or "prod"'
+  subscriptionScope: '/subscriptions/YOUR_SUBSCRIPTION_ID'
+
+jobs:
+- job: DeployPolicy
+  displayName: 'Deploy Azure Policy'
+  steps:
+  - task: AzureCLI@2
+    inputs:
+      azureSubscription: $(azureSubscription)
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        # Create Policy Definition
+        az policy definition create \
+          --name $(policyDefinitionName) \
+          --display-name "$(policyDisplayName)" \
+          --description "$(policyDescription)" \
+          --rules @policies/require-environment-tag.json \
+          --mode All
+
+        # Assign Policy
+        az policy assignment create \
+          --name $(policyAssignmentName) \
+          --policy $(policyDefinitionName) \
+          --scope $(subscriptionScope)
